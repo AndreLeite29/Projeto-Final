@@ -1,188 +1,356 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace ProjetoFinal
+namespace Stand_v2
 {
     class Program
     {
-        public abstract class Veiculo // não pode ser instanciada
-        {                                      
-            public string marca, motor, cor, matricula;                  //Atributos
-            public int kilometros, cavalos, preço;
-            public bool novo;
-
-            public Veiculo(string marca, int kilometros, string motor, int cavalos, string cor, int preço, bool novo, string matricula) //Parametros
-            {
-                this.marca = marca;
-                this.kilometros = kilometros;
-                this.motor = motor;
-                this.cavalos = cavalos;
-                this.cor = cor;
-                this.preço = preço;
-                this.novo = novo;
-                this.matricula = matricula;
-            }
-        }
-        class Mota : Veiculo                                //MOTA
+        class Carros 
         {
-            public int rodas;                                    //Atributos
-
-            public Mota(int rodas, string marca, int kilometros, string motor, int cavalos, string cor, int preço, bool novo, string matricula) :base(marca, kilometros, motor, cavalos, cor, preço, novo, matricula) //Parametros 
+            public Carros(string name, int miles_per_Gallon, int cylinders, int kilometers, int horsepower, int weight_in_lbs, float acceleration, string year, string origin, int price)
             {
-                this.rodas = rodas;
+                Name = name;
+                Miles_per_Gallon = miles_per_Gallon;
+                Cylinders = cylinders;
+                Kilometers = kilometers;
+                Horsepower = horsepower;
+                Weight_in_lbs = weight_in_lbs;
+                Acceleration = acceleration;
+                Year = year;
+                Origin = origin;
+                Price = price;
             }
 
-            public void CompararKilometrosMotas(object objeto) //Metodo comparar kilometros das motas
+            public string Name { get; set; }
+
+            public int Miles_per_Gallon { get; set; }
+
+            public int Cylinders { get; set; }
+
+            public int Kilometers { get; set; }
+
+            public int Horsepower { get; set; }
+
+            public int Weight_in_lbs { get; set; }
+
+            public float Acceleration { get; set; }
+
+            public string Year { get; set; }
+
+            public string Origin { get; set; }
+
+            public int Price { get; set; }
+        }                                        //Propriedades
+
+        class Stand
+        {
+            public static void LerFicheiro(string FicheiroCaminho)
             {
-                Mota mota = (Mota)(objeto);
-                if (this.kilometros > mota.kilometros)
-                    Console.WriteLine("A matricula " + this.matricula + " possui mais quilometros do que a matricula " + mota.matricula);
-                else if (this.kilometros < mota.kilometros)
-                    Console.WriteLine("A matricula " + this.matricula + " possui menos quilometros do que a matricula " + mota.matricula);
+                if (File.Exists(FicheiroCaminho))
+                {
+                    StreamReader FicheiroNome = File.OpenText(FicheiroCaminho);             //Abrir ficheiro
+                    string LerTudo = FicheiroNome.ReadToEnd();                              //Ler ficheiro
+                    ListaCarros = JsonConvert.DeserializeObject<List<Carros>>(LerTudo);     //Passar informação do ficheiro para a lista            
+                    FicheiroNome.Close();                                                   //Fechar ficheiro
+                }
                 else
-                     Console.WriteLine("A matricula " + this.matricula + " possui os mesmos quilometros do que a matricula " + mota.matricula);
-            }
-        }
-
-        class Carro : Veiculo                              //CARRO   
-        {                          
-            public int portas, rodas;   //Atributos
-
-            public Carro(int portas, int rodas, string marca, int kilometros, string motor, int cavalos, string cor, int preço, bool novo, string matricula) : base(marca, kilometros, motor, cavalos, cor, preço, novo, matricula)//construtor por default
+                {
+                    Console.WriteLine("Ficheiro não encontrado");
+                }
+            }       //Metodo para Ler ficheiro
+            public static void ImprimirTodosCarros()
             {
-                this.rodas = rodas;
-                this.portas = portas;
-            }
+
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+
+                    Console.WriteLine(ListaCarros[i].Name);
+
+                }
+            }   //Metodo para imprimir o nome de todos os carros
+            public static void ImprimirTodasInformacoesCarros()
+            {
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    Console.WriteLine("Nome: " + ListaCarros[i].Name);
+                    Console.WriteLine("Miles_per_Gallon: " + ListaCarros[i].Miles_per_Gallon);
+                    Console.WriteLine("Kilometers: " + ListaCarros[i].Kilometers);
+                    Console.WriteLine("Horsepower: " + ListaCarros[i].Horsepower);
+                    Console.WriteLine("Weight_in_lbs: " + ListaCarros[i].Weight_in_lbs);
+                    Console.WriteLine("Acceleration: " + ListaCarros[i].Acceleration);
+                    Console.WriteLine("Year: " + ListaCarros[i].Year);
+                    Console.WriteLine("Origin: " + ListaCarros[i].Origin);
+                    Console.WriteLine("Price: " + ListaCarros[i].Price);
+                    Console.WriteLine("\n----------------------\n");
+                }
+            }   //Metodo para imprimir a informação total de todos os carros
+            public static int Maiscavalos() 
+            {
+                int Maiornumcavalos = 0;
+
+                for (int i=0; i < ListaCarros.Count; i++)
+                {
+                    if(ListaCarros[i].Horsepower > Maiornumcavalos)
+                    {
+
+                        Maiornumcavalos = ListaCarros[i].Horsepower;
+
+                    }
+                }
+                return Maiornumcavalos;
+                
+            }            //Metodo para retornar o carro com maior numero de cavalos no stand
+            public static int Menoscavalos()
+            {
+                int menorcavalos = 300;
+
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Horsepower < menorcavalos)
+                    {
+
+                        menorcavalos = ListaCarros[i].Horsepower;
+
+                    }
+                }
+                return menorcavalos;
+
+            }            //Metodo para retornar o carro com menor numero de cavalos no stand
+            public static void MenosKilometros()
+            {
+                int MenorKilometros = 10000000;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Kilometers < MenorKilometros)
+                    {
+
+                        MenorKilometros = ListaCarros[i].Kilometers;
+
+                    }
+                }
+                Console.WriteLine(MenorKilometros);
+            }       //Metodo para imprimir o carro com menor numero de kilometros
+            public static void MaisKilometros()
+            {
+                int MaiorKilometros = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Kilometers < MaiorKilometros)
+
+                    {
+
+                        MaiorKilometros = ListaCarros[i].Kilometers;
+
+                    }
+                }
+                Console.WriteLine(MaiorKilometros);
+            }       //Metodo para imprimir o carro com maior numero de kilometros
+            public static void FiltrarKilometros(int kilometros1, int kilometros2)
+            {
+                List<Carros> CarrosPossiveis= new List<Carros>();        //Lista filtrar kilometros               
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Kilometers >= kilometros1 && ListaCarros[i].Kilometers <= kilometros2 || ListaCarros[i].Kilometers <= kilometros1 && ListaCarros[i].Kilometers >= kilometros2)
+                    {
+
+                        CarrosPossiveis.Add(ListaCarros[i]);
+
+                    }
+                }
+                for (int j = 0; j < CarrosPossiveis.Count; j++)
+                {
+
+                    Console.WriteLine(CarrosPossiveis[j].Name);
+
+                }
+                 if (CarrosPossiveis.Count == 0)
+                {
+
+                    Console.WriteLine("Não existem carros nesses parametros");
+
+                }
+            }   //Metodo para filtrar kilometros entre dois parametros
+            public static int MelhorMediaConsumo()
+            {
+                int gasoleo = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Miles_per_Gallon > gasoleo )
+                    {
+
+                        gasoleo = ListaCarros[i].Miles_per_Gallon;
+
+                    }
+                }
+                return gasoleo;
+            }         //Metodo para retornar a melhor média de consumo
+            public static float MaiorAceleracao()
+            {
+                float aceleracao = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Acceleration > aceleracao)
+                    {
+
+                        aceleracao = ListaCarros[i].Acceleration;
+
+                    }
+                }
+                return aceleracao;
+            }           //Metodo para retornar o carro com a maior aceleracao
+            public static int MaisCaro()
+            {
+                int maiorpreço = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Price > maiorpreço)
+                    {
+
+                        maiorpreço = ListaCarros[i].Price;
+
+                    }
+                }
+                return maiorpreço;
+            }                   //Metodo para retornar o carro mais caro
+            public static int MaisBarato()
+            {
+                int menorpreco = 100000000;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Price < menorpreco)
+                    {
+
+                        menorpreco = ListaCarros[i].Price;
+
+                    }
+                }
+                return menorpreco;
+            }                   //Metodo para retornar o carro mais barato
+            public static int TotalSaldo()
+            {
+                int precototal = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    precototal += ListaCarros[i].Price;
+                }
+                return precototal;
+            }                   //Metodo para retornar o saldo em carros do stand
+            public static int MediaCarros()
+            {
+                int mediapreco = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    mediapreco += ListaCarros[i].Price;
+                }
+                mediapreco = mediapreco / ListaCarros.Count;
+                return mediapreco;
+            }                   //Metodo para retornar a media total do saldo de todos os carros
+
+            //public static DateTime MaisAntigo()                     //Metodo para retornar o carro mais antigo
+            //{
+            //    for (int i = 0; i < ListaCarros.Count; i++)
+            //    {
+            //            ListaCarros[i].Year;
+            //    }
+            //}                                        
+            //public static DateTime MaisRecente()                    //Metodo para retornar o carro mais recente
+            //{
+            //    for (int i = 0; i < ListaCarros.Count; i++)
+            //    {
+            //        ListaCarros[i].Year;
+            //    }
+            //}                              
+            
+            public static void Origem(string origem1)
+            {
+                int quantidade = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Origin == origem1)
+                    {
+                        quantidade += 1;
+                    }
+                }
+                Console.WriteLine(quantidade);
+            }             //Metodo para retornar o numero de carros originarios de "origem1"
+            public static int MaisPesado()
+            {
+                int maiorpeso = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Weight_in_lbs > maiorpeso)
+                    {
+
+                        maiorpeso = ListaCarros[i].Weight_in_lbs;
+
+                    }                    
+                }
+                return maiorpeso;
+            }                         //Metodo para retornar o valor do carro mais pesado
+            public static int MenosPesado()
+            {
+                int menorpeso = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    if (ListaCarros[i].Weight_in_lbs < menorpeso)
+                    {
+
+                        menorpeso = ListaCarros[i].Weight_in_lbs;
+
+                    }
+                }
+                return menorpeso;
+            }                         //Metodo para retornar o valor do carro mais pesado
+            public static int MediadoPeso()
+            {
+                int mediapeso = 0;
+                for (int i = 0; i < ListaCarros.Count; i++)
+                {
+                    mediapeso += ListaCarros[i].Weight_in_lbs;
+                }
+                mediapeso = mediapeso / ListaCarros.Count;
+                return mediapeso;
+            }                       //Metodo para retornar a media de todos os carros do stand
+            public static void AdicionarCarros(string Name, int Miles_per_Gallon, int Cylinders, int Kilometers, int Horsepower, int Weight_in_lbs, float Acceleration, string Year, string Origin, int Price)
+            {
+                string FicheiroCaminho = (@"D:\Users\André\Desktop\carros.json");
+                StreamReader FicheiroNome = File.OpenText(FicheiroCaminho);             //Abrir ficheiro
+                string LerTudo = FicheiroNome.ReadToEnd();                              //Ler ficheiro até ao fim
+                FicheiroNome.Close();                                                   //Fechar ficheiro
+                ListaCarros.Add(new Carros(Name, Miles_per_Gallon, Cylinders, Kilometers, Horsepower, Weight_in_lbs, Acceleration, Year, Origin, Price));       //Adicionar à lista o carro do utilizador
+                string Copiar = JsonConvert.SerializeObject(ListaCarros.ToArray());     //Coverter os objetos da lista num array
+                StreamWriter sw = new StreamWriter(FicheiroCaminho);                    //Caminho
+                sw.Write(Copiar);                                                       //Reescrever o ficheiro json
+                sw.Close();                                                             //Fechar ficheiro
+
+            } //Metodo para adicionar carros ao json
         }
 
+        private static List<Carros> ListaCarros;            //Lista dos Carros
         static void Main(string[] args)
         {
-            Mota novamota1 = new Mota(2, "Volvo", 120000, "V1", 90, "Amarelo", 5600, false,"AAAAAA");           //Instanciar objeto
-            Mota novamota2 = new Mota(4, "Fiat", 20, "V1", 90, "Amarelo", 10000, true,"BBBBB");                 //Instanciar objeto
-
-            novamota1.CompararKilometrosMotas(novamota2);  //Chamar o metodo de comprar os kilometros da mota, (novamota1 é .this) e (novamota2 é objeto)
-
-
-            List < Carro > listacarros = new List<Carro>();         //Criar lista Motas
-
-            listacarros.Add(new Carro(5, 4, "bmw", 200000, "V8", 200, "Preto", 30000, false, "AAAAAA"));       //Adicionar Carro à lista
-            listacarros.Add(new Carro(5, 4, "Fiat", 10, "V9", 320, "Azul", 50000,true,"BBBBBB"));               //Adicionar Carro à lista
-            listacarros.Add(new Carro(3, 4, "Audi", 20, "V5", 70, "Cinzento", 2000, true, "BBEEEA"));
-
-            float preco_total_carros = 0;
-            float preco_total_motas = 0;
-            float preco_total = 0;
-
-            List<Mota> listamotas = new List<Mota>();               //Criar lista Motas
-
-            listamotas.Add(new Mota(4, "Volvo", 20, "V3", 150, "Roxa", 20000, true, "CCCCCCC"));                //Adicionar Mota à lista
-            listamotas.Add(new Mota(2, "Vespa", 100000, "V2", 100, "Preta", 5200, false, "DDDDDDDD"));          //Adicionar Mota à lista
-            listamotas.Add(new Mota(2, "Vespa", 300000, "V1", 60, "Azul", 3000, false, "EDADVEL"));
-
-            for (int i = 0; i<listacarros.Count; i++)                                                           //Ciclo para soma do preço dos carros
-            {
-                preco_total_carros += listacarros[i].preço;
-            }
-            Console.WriteLine("Preço da soma de todos os carros do stand " + preco_total_carros + " $");
-
-            for (int i = 0; i < listamotas.Count; i++)                                                          //Ciclo para soma do preço das motas
-            {
-                preco_total_motas += listamotas[i].preço;
-            }
-            Console.WriteLine("Preço da soma de todas as motas do stand " + preco_total_motas + " $");
-
-            preco_total = preco_total_motas + preco_total_carros;
-
-            Console.WriteLine("Preço da soma de todos os veiculos do stand " + preco_total + " $");             //Imprimir preço total dos veiculos
-
-
-            //--------------------------------------------------------------------------------------------//
-
-            int listacarrosnovos = 0;
-            int listamotasnovas = 0;
-            int listaveiculosnovos = 0;
-
-            for (int i = 0; i < listacarros.Count; i++)                                                           //Ciclo para contar os veiculos novos
-            {
-                if(listacarros[i].novo == true)
-                {
-                    listacarrosnovos += 1;
-
-                }
-            }
-
-            for (int i = 0; i < listamotas.Count; i++)                                                           //Ciclo para contar os veiculos novos
-            {
-                if (listamotas[i].novo == true)
-                {
-                    listamotasnovas += 1;
-                }
-            }
-
-            listaveiculosnovos = listacarrosnovos + listamotasnovas;
-
-
-            Console.WriteLine("Existem " + listaveiculosnovos + " veiculos novos no stand!");                //Imprimir veiculos novos no stand
-
-
-            //-----------------------------------------------------------------------------------------//
-            //float valor1 = 10000;        //valor para substituir pelo valor minimo da relação preço/kilometro é "10000" para nunca atingir aquele valor
-            //float valor2 = 10000;
-            //string matricula1 = "";
-            //string matricula2 = "";
-
-
-            //for (int i = 0; i < listacarros.Count; i++)                                                           
-            //{
-            //    if (listacarros[i].kilometros/listacarros[i].preço < valor1)
-            //    {
-            //        valor1 = listacarros[i].kilometros / listacarros[i].preço;          //valor para substituir pelo valor minimo da relação preço/kilometro
-            //        matricula1 = listacarros[i].matricula;                              //matricula do carro com melhor relação
-            //    }
-            //}
-            //for (int i = 0; i < listamotas.Count; i++)                                                           
-            //{
-            //    if (listamotas[i].kilometros / listamotas[i].preço < valor2)
-            //    {
-            //        valor2 = listamotas[i].kilometros / listamotas[i].preço;        //valor para substituir pelo valor minimo da relação preço/kilometro
-            //        matricula2 = listamotas[i].matricula;                           //matricula da mota com melhor relação
-            //    }
-            //}
-            //if(valor1 > valor2)
-            //{
-            //    Console.WriteLine("A matricula do veiculo com melhor relação preço/quilometros é " + matricula2 );
-            //}
-            //else if (valor2 > valor1)
-            //{
-            //    Console.WriteLine("A matricula do veiculo com melhor relação preço/quilometros é " + matricula1);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("As matriculas dos veiculos com melhor relação preço/quilometros são " + matricula1 + " e " + matricula2);
-            //}
-
-            int maiornumcavalos = 0;
-            string matriculamaiorcavalos = "";
-            int menornumcavalos = 300;
-            string matriculamenorcavalos = "";
-
-            for (int i=0; i < listacarros.Count; i++)
-            {
-                if(listacarros[i].cavalos > maiornumcavalos)
-                {
-                    maiornumcavalos = listacarros[i].cavalos;                       //Comparar cavalos e guarda o maior
-                    matriculamaiorcavalos = listacarros[i].matricula;
-
-                }
-                else if(listacarros[i].cavalos < menornumcavalos)
-                {
-                    menornumcavalos = listacarros[i].cavalos;                       //Comparar cavalos e guarda o menor
-                    matriculamenorcavalos = listacarros[i].matricula;
-                }
-            }
-
-            Console.WriteLine("A matricula do carro mais potente é " + matriculamaiorcavalos + " e conta com " + maiornumcavalos + " cavalos");
-            Console.WriteLine("A matricula do carro menos potente é " + matriculamenorcavalos + " e conta com " + menornumcavalos + " cavalos");
+            Stand.LerFicheiro(@"D:\Users\André\Desktop\carros.json");
+            //Stand.ImprimirTodosCarros();
+            //Stand.ImprimirTodasInformacoesCarros();
+            //Stand.Maiscavalos();
+            //Stand.Menoscavalos();
+            //Stand.MenosKilometros();
+            //Stand.MaisKilometros();
+            //Stand.FiltrarKilometros(100000, 300000);
+            //Stand.MelhorMediaConsumo();
+            //Stand.MaiorAceleracao();
+            //Stand.MaisCaro();
+            //Stand.TotalSaldo();
+            //Stand.Origem("Portugal");
+            //Stand.MediaCarros();
+            //Stand.MaisPesado();
+            //Stand.MenosPesado();
+            //Stand.EscreverFicheiro()
+            //Stand.AdicionarCarros("peugeot", 2, 3, 200, 100, 3000, 10,"2020-10-20", "Italy", 205000);
         }
     }
 }
